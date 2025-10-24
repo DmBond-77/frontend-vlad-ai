@@ -16,6 +16,14 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
+// ✅ форматируем числа красиво: 1 234 567 ₸
+const formatCurrency = (num: number) =>
+  new Intl.NumberFormat("ru-RU", {
+    style: "currency",
+    currency: "KZT",
+    maximumFractionDigits: 0,
+  }).format(num);
+
 export default function FinanceCalculators() {
   const [activeTab, setActiveTab] = useState("loan");
 
@@ -43,7 +51,7 @@ export default function FinanceCalculators() {
     const r = parseFloat(loan.rate) / 100 / 12;
     if (!P || !n || !r) return;
 
-    const payment = P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+    const payment = (P * (r * Math.pow(1 + r, n))) / (Math.pow(1 + r, n) - 1);
     const total = payment * n;
     const overpay = total - P;
 
@@ -73,7 +81,7 @@ export default function FinanceCalculators() {
     const r = parseFloat(mortgage.rate) / 100 / 12;
     if (!P || !n || !r) return;
 
-    const payment = P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+    const payment = (P * (r * Math.pow(1 + r, n))) / (Math.pow(1 + r, n) - 1);
     const total = payment * n;
     const overpay = total - P;
 
@@ -119,7 +127,7 @@ export default function FinanceCalculators() {
     setActiveTab("deposit");
   };
 
-  // 🧮 Функция для получения данных конкретного графика
+  // 🧮 Выбор активного графика
   const getChartData = () => {
     if (activeTab === "loan") return loanChart;
     if (activeTab === "mortgage") return mortgageChart;
@@ -143,7 +151,6 @@ export default function FinanceCalculators() {
             </TabsTrigger>
           </TabsList>
 
-          {/* Заголовок калькулятора */}
           <h2 className="text-xl font-semibold mb-3">
             {activeTab === "loan"
               ? "Кредитный калькулятор"
@@ -152,7 +159,7 @@ export default function FinanceCalculators() {
                 : "Депозитный калькулятор"}
           </h2>
 
-          {/* --- Кредит --- */}
+          {/* === Кредит === */}
           <TabsContent value="loan">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -187,15 +194,15 @@ export default function FinanceCalculators() {
                   animate={{ opacity: 1 }}
                   className="mt-3 text-sm space-y-1"
                 >
-                  <p>💵 Ежемесячный платёж: <b>{loanResult.payment.toFixed(2)} ₸</b></p>
-                  <p>📅 Общая сумма выплат: <b>{loanResult.total.toFixed(2)} ₸</b></p>
-                  <p>⚠️ Переплата: <b>{loanResult.overpay.toFixed(2)} ₸</b></p>
+                  <p>💵 Ежемесячный платёж: <b>{formatCurrency(loanResult.payment)}</b></p>
+                  <p>📅 Общая сумма выплат: <b>{formatCurrency(loanResult.total)}</b></p>
+                  <p>⚠️ Переплата: <b>{formatCurrency(loanResult.overpay)}</b></p>
                 </motion.div>
               )}
             </motion.div>
           </TabsContent>
 
-          {/* --- Ипотека --- */}
+          {/* === Ипотека === */}
           <TabsContent value="mortgage">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
@@ -203,36 +210,28 @@ export default function FinanceCalculators() {
                   type="number"
                   placeholder="Стоимость жилья (₸)"
                   value={mortgage.amount}
-                  onChange={(e) =>
-                    setMortgage({ ...mortgage, amount: e.target.value })
-                  }
+                  onChange={(e) => setMortgage({ ...mortgage, amount: e.target.value })}
                   className="p-2 border rounded-md bg-muted text-sm"
                 />
                 <input
                   type="number"
                   placeholder="Первоначальный взнос (₸)"
                   value={mortgage.down}
-                  onChange={(e) =>
-                    setMortgage({ ...mortgage, down: e.target.value })
-                  }
+                  onChange={(e) => setMortgage({ ...mortgage, down: e.target.value })}
                   className="p-2 border rounded-md bg-muted text-sm"
                 />
                 <input
                   type="number"
                   placeholder="Срок (мес.)"
                   value={mortgage.term}
-                  onChange={(e) =>
-                    setMortgage({ ...mortgage, term: e.target.value })
-                  }
+                  onChange={(e) => setMortgage({ ...mortgage, term: e.target.value })}
                   className="p-2 border rounded-md bg-muted text-sm"
                 />
                 <input
                   type="number"
                   placeholder="Ставка (% годовых)"
                   value={mortgage.rate}
-                  onChange={(e) =>
-                    setMortgage({ ...mortgage, rate: e.target.value })
-                  }
+                  onChange={(e) => setMortgage({ ...mortgage, rate: e.target.value })}
                   className="p-2 border rounded-md bg-muted text-sm"
                 />
               </div>
@@ -245,15 +244,15 @@ export default function FinanceCalculators() {
                   animate={{ opacity: 1 }}
                   className="mt-3 text-sm space-y-1"
                 >
-                  <p>💵 Ежемесячный платёж: <b>{mortgageResult.payment.toFixed(2)} ₸</b></p>
-                  <p>📅 Общая сумма выплат: <b>{mortgageResult.total.toFixed(2)} ₸</b></p>
-                  <p>⚠️ Переплата: <b>{mortgageResult.overpay.toFixed(2)} ₸</b></p>
+                  <p>💵 Ежемесячный платёж: <b>{formatCurrency(mortgageResult.payment)}</b></p>
+                  <p>📅 Общая сумма выплат: <b>{formatCurrency(mortgageResult.total)}</b></p>
+                  <p>⚠️ Переплата: <b>{formatCurrency(mortgageResult.overpay)}</b></p>
                 </motion.div>
               )}
             </motion.div>
           </TabsContent>
 
-          {/* --- Депозит --- */}
+          {/* === Депозит === */}
           <TabsContent value="deposit">
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -261,27 +260,21 @@ export default function FinanceCalculators() {
                   type="number"
                   placeholder="Сумма вклада (₸)"
                   value={deposit.amount}
-                  onChange={(e) =>
-                    setDeposit({ ...deposit, amount: e.target.value })
-                  }
+                  onChange={(e) => setDeposit({ ...deposit, amount: e.target.value })}
                   className="p-2 border rounded-md bg-muted text-sm"
                 />
                 <input
                   type="number"
                   placeholder="Срок (мес.)"
                   value={deposit.term}
-                  onChange={(e) =>
-                    setDeposit({ ...deposit, term: e.target.value })
-                  }
+                  onChange={(e) => setDeposit({ ...deposit, term: e.target.value })}
                   className="p-2 border rounded-md bg-muted text-sm"
                 />
                 <input
                   type="number"
                   placeholder="Ставка (% годовых)"
                   value={deposit.rate}
-                  onChange={(e) =>
-                    setDeposit({ ...deposit, rate: e.target.value })
-                  }
+                  onChange={(e) => setDeposit({ ...deposit, rate: e.target.value })}
                   className="p-2 border rounded-md bg-muted text-sm"
                 />
               </div>
@@ -294,23 +287,29 @@ export default function FinanceCalculators() {
                   animate={{ opacity: 1 }}
                   className="mt-3 text-sm space-y-1"
                 >
-                  <p>💰 Итоговая сумма: <b>{depositResult.total.toFixed(2)} ₸</b></p>
-                  <p>📈 Доход: <b>{depositResult.profit.toFixed(2)} ₸</b></p>
+                  <p>💰 Итоговая сумма: <b>{formatCurrency(depositResult.total)}</b></p>
+                  <p>📈 Доход: <b>{formatCurrency(depositResult.profit)}</b></p>
                 </motion.div>
               )}
             </motion.div>
           </TabsContent>
         </Tabs>
 
-        {/* 📊 График — только для активной вкладки */}
+        {/* 📊 График */}
         {getChartData().length > 0 && (
           <motion.div className="mt-6 h-64" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={getChartData()}>
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
                 <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                <YAxis tick={{ fontSize: 12 }} />
-                <Tooltip />
+                <YAxis
+                  tickFormatter={(v) => `${(v / 1000000).toFixed(1)}M`}
+                  tick={{ fontSize: 12 }}
+                />
+                <Tooltip
+                  formatter={(value: any) => formatCurrency(value)}
+                  labelFormatter={(label) => `Месяц ${label}`}
+                />
                 <Legend />
                 <Line
                   type="monotone"
