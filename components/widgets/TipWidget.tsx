@@ -35,7 +35,7 @@ export default function TipWidget() {
   }, []);
 
   return (
-    <div className="relative overflow-hidden min-h-[90px] flex items-center justify-center text-center px-3">
+    <div className="relative overflow-hidden min-h-[90px] flex items-center justify-center  px-3">
       <AnimatePresence mode="wait">
         <motion.div
           key={index}
@@ -43,7 +43,7 @@ export default function TipWidget() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -15 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
-          className="flex items-center gap-3 text-base sm:text-xl md:text-2xl text-muted-foreground"
+          className="flex items-center gap-3 text-base sm:text-xl  text-muted-foreground"
         >
           {/* 💡 Анимация свечения лампочки */}
           <motion.div

@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import UploadWidget from "@/components/widgets/UploadWidget";
 import CurrencyWidget from "@/components/widgets/CurrencyWidget";
 import TipWidget from "@/components/widgets/TipWidget";
+import FinanceCalculators from "@/components/widgets/FinanceCalculators";
 
 export default function DashboardPage() {
   const [darkMode, setDarkMode] = useState(false);
@@ -30,9 +31,9 @@ export default function DashboardPage() {
       transition: { delay: i * 0.08, duration: 0.3, ease: "easeOut" },
     }),
     hover: {
-      scale: 1.002, // ✅ Минимальный scale, без смещения текста
+      scale: 1, // без движения
       boxShadow:
-        "0 0 16px rgba(16,185,129,0.35), 0 6px 18px rgba(0,0,0,0.08)", // glow 💚
+        "0 0 20px rgba(16,185,129,0.4), 0 0 10px rgba(16,185,129,0.2) inset", // 💚 внешний + внутренний glow
       transition: { duration: 0.25, ease: "easeOut" },
     },
   };
@@ -42,12 +43,12 @@ export default function DashboardPage() {
       title: (
         <div className="flex items-center gap-3">
           <MessageSquare className="w-7 h-7 text-primary" />
-          <span className="text-xl font-semibold">AI-чат ассистент</span>
+          <span className="text-2xl font-semibold">AI-чат ассистент</span>
         </div>
       ),
       content: (
         <>
-          <p className="text-sm text-muted-foreground mb-3">
+          <p className="text-base text-muted-foreground mb-3">
             Задай свой вопрос SaveUp — например:{" "}
             <em>"Как улучшить мои сбережения?"</em>
           </p>
@@ -56,9 +57,7 @@ export default function DashboardPage() {
             placeholder="Введите вопрос..."
           />
           <div className="flex justify-end mt-3">
-            <motion.div whileTap={{ scale: 0.95 }}>
-              <Button size="sm">Отправить</Button>
-            </motion.div>
+            <Button size="sm">Отправить</Button>
           </div>
         </>
       ),
@@ -68,7 +67,7 @@ export default function DashboardPage() {
       title: (
         <div className="flex items-center gap-3">
           <DollarSign className="w-7 h-7 text-primary" />
-          <span className="text-xl font-semibold">Курсы валют</span>
+          <span className="text-2xl font-semibold">Курсы валют</span>
         </div>
       ),
       content: <CurrencyWidget />,
@@ -78,7 +77,7 @@ export default function DashboardPage() {
       title: (
         <div className="flex items-center gap-3">
           <Upload className="w-7 h-7 text-primary" />
-          <span className="text-xl font-semibold">
+          <span className="text-2xl font-semibold">
             Анализ расходов (PDF / Excel)
           </span>
         </div>
@@ -90,44 +89,22 @@ export default function DashboardPage() {
       title: (
         <div className="flex items-center gap-3">
           <Calculator className="w-7 h-7 text-primary" />
-          <span className="text-xl font-semibold">Кредитный калькулятор</span>
+          <span className="text-2xl font-semibold">Финансовые калькуляторы</span>
         </div>
       ),
-      content: (
-        <form className="space-y-2 text-sm">
-          <input
-            type="number"
-            placeholder="Сумма кредита"
-            className="w-full p-2 border rounded-md bg-muted"
-          />
-          <input
-            type="number"
-            placeholder="Срок (мес.)"
-            className="w-full p-2 border rounded-md bg-muted"
-          />
-          <input
-            type="number"
-            placeholder="Процентная ставка (%)"
-            className="w-full p-2 border rounded-md bg-muted"
-          />
-          <motion.div whileTap={{ scale: 0.95 }}>
-            <Button className="w-full mt-2" size="sm">
-              Рассчитать
-            </Button>
-          </motion.div>
-        </form>
-      ),
-      span: "md:col-span-1",
+      content: <FinanceCalculators />,
+      // ✅ На маленьких экранах — вся ширина, на больших — 1 колонка
+      span: "col-span-3 xl:col-span-2",
     },
     {
       title: (
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 ">
           <Brain className="w-7 h-7 text-primary" />
-          <span className="text-xl font-semibold">Совет от AI</span>
+          <span className="text-2xl font-semibold">Совет от AI</span>
         </div>
       ),
       content: <TipWidget />,
-      span: "md:col-span-2",
+      span: "col-span-3 xl:col-span-1",
     },
   ];
 
@@ -155,25 +132,21 @@ export default function DashboardPage() {
             height={40}
             priority
           />
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
-            SaveUp Dashboard
-          </h1>
+          <h1 className="text-3xl font-bold tracking-tight">SaveUp Dashboard</h1>
         </div>
 
-        <motion.div whileHover={{ rotate: 15 }} whileTap={{ scale: 0.9 }}>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => setDarkMode(!darkMode)}
-            aria-label="Toggle theme"
-          >
-            {darkMode ? <Sun size={18} /> : <Moon size={18} />}
-          </Button>
-        </motion.div>
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => setDarkMode(!darkMode)}
+          aria-label="Toggle theme"
+        >
+          {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+        </Button>
       </motion.header>
 
-      {/* ✅ Сетка: адаптив + фиксированный контент */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      {/* ✅ Сетка карточек */}
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
         {cards.map((card, i) => (
           <motion.div
             key={i}
@@ -183,7 +156,7 @@ export default function DashboardPage() {
             whileHover="hover"
             custom={i}
             className={cn(
-              "rounded-xl border border-border bg-card/90 backdrop-blur-sm transition-transform duration-200",
+              "rounded-xl border border-border bg-card/90 backdrop-blur-sm transition duration-300",
               card?.span || ""
             )}
           >
