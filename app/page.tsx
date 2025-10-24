@@ -15,6 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 import UploadWidget from "@/components/widgets/UploadWidget";
 import CurrencyWidget from "@/components/widgets/CurrencyWidget";
+import Image from "next/image";
 
 
 export default function DashboardPage() {
@@ -58,9 +59,19 @@ export default function DashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
+        <div className="flex items-center justify-between gap-2" >
+          <Image
+            src="/logo.png" // путь к файлу (например, /public/logo.png)
+            alt="SaveUp Logo"
+            width={48}
+            height={48}
+            priority // загружает сразу (для логотипа это нормально)
+            // className="h-40 w-40"
+          />
         <h1 className="text-2xl font-bold tracking-tight">
-          AI Banking Dashboard
+          SaveUp Dashboard
         </h1>
+        </div>
 
         <motion.div whileHover={{ rotate: 15 }} whileTap={{ scale: 0.9 }}>
           <Button
@@ -87,7 +98,7 @@ export default function DashboardPage() {
             content: (
               <>
                 <p className="text-sm text-muted-foreground mb-3">
-                  Задай вопрос модели Mistral — например:{" "}
+                  Задай свой вопрос SaveUp — например:{" "}
                   <em>"Как улучшить мои сбережения?"</em>
                 </p>
                 <textarea
