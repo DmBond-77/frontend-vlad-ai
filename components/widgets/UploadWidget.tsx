@@ -4,25 +4,29 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { CardContent } from "@/components/ui/card";
-import {
-  Upload,
-  Loader2,
-  CheckCircle,
-  AlertTriangle,
-  PiggyBank,
-} from "lucide-react";
+import { Loader2, CheckCircle, AlertTriangle, PiggyBank } from "lucide-react";
+import FinanceCharts from "./FinanceCharts";
+
+type ApiResponse = {
+  reply: string;
+  transactions: { date: string; category: string; amount: number }[];
+  by_category: { name: string; value: number }[];
+  by_date: { date: string; amount: number }[];
+};
 
 export default function UploadWidget() {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [reply, setReply] = useState<string[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [chartData, setChartData] = useState<ApiResponse | null>(null);
 
   async function handleAnalyze() {
     if (!file) return;
     setLoading(true);
     setReply(null);
     setError(null);
+    setChartData(null);
 
     const formData = new FormData();
     formData.append("file", file);
@@ -38,8 +42,9 @@ export default function UploadWidget() {
         throw new Error(data.detail || "Ошибка анализа");
       }
 
-      const data = await res.json();
+      const data: ApiResponse = await res.json();
       setReply(formatResponse(data.reply));
+      setChartData(data);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -47,7 +52,7 @@ export default function UploadWidget() {
     }
   }
 
-  // 🧹 Форматируем ответ в список
+  // 🧹 Форматируем ответ AI в список
   function formatResponse(text: string): string[] {
     if (!text) return [];
     const cleaned = text
@@ -63,14 +68,9 @@ export default function UploadWidget() {
     return parts;
   }
 
-  // 🎬 Анимации для пунктов
   const listVariants = {
     hidden: {},
-    visible: {
-      transition: {
-        staggerChildren: 0.25, // поочередное появление
-      },
-    },
+    visible: { transition: { staggerChildren: 0.25 } },
   };
 
   const itemVariants = {
@@ -84,6 +84,7 @@ export default function UploadWidget() {
         Загрузите банковскую выписку (.pdf, .xlsx или .csv), и AI проанализирует ваши расходы.
       </p>
 
+      {/* Загрузка файла */}
       <input
         type="file"
         accept=".pdf,.xlsx,.csv"
@@ -93,6 +94,7 @@ export default function UploadWidget() {
                    file:bg-primary file:text-primary-foreground hover:file:opacity-90 cursor-pointer"
       />
 
+      {/* Кнопка анализа */}
       <div className="flex justify-end mt-3">
         <Button
           onClick={handleAnalyze}
@@ -155,12 +157,7 @@ export default function UploadWidget() {
             >
               {reply.map((item, i) => {
                 const Icon =
-                  i === 0
-                    ? AlertTriangle
-                    : i === 1
-                      ? CheckCircle
-                      : PiggyBank;
-
+                  i === 0 ? AlertTriangle : i === 1 ? CheckCircle : PiggyBank;
                 return (
                   <motion.li
                     key={i}
@@ -173,6 +170,24 @@ export default function UploadWidget() {
                 );
               })}
             </motion.ul>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Графики после анализа */}
+      <AnimatePresence>
+        {chartData && chartData.transactions?.length > 0 && (
+          <motion.div
+            key="charts"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="mt-8"
+          >
+            <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+              📊 Визуализация данных
+            </h3>
+            <FinanceCharts data={chartData.transactions} />
           </motion.div>
         )}
       </AnimatePresence>
