@@ -19,6 +19,7 @@ import UploadWidget from "@/components/widgets/UploadWidget";
 import CurrencyWidget from "@/components/widgets/CurrencyWidget";
 import TipWidget from "@/components/widgets/TipWidget";
 import FinanceCalculators from "@/components/widgets/FinanceCalculators";
+import ChatWidget from "@/components/widgets/ChatWidget";
 
 export default function DashboardPage() {
   const [darkMode, setDarkMode] = useState(false);
@@ -46,23 +47,10 @@ export default function DashboardPage() {
           <span className="text-2xl font-semibold">AI-чат ассистент</span>
         </div>
       ),
-      content: (
-        <>
-          <p className="text-base text-muted-foreground mb-3">
-            Задай свой вопрос SaveUp — например:{" "}
-            <em>"Как улучшить мои сбережения?"</em>
-          </p>
-          <textarea
-            className="w-full h-24 p-2 border rounded-md bg-muted resize-none"
-            placeholder="Введите вопрос..."
-          />
-          <div className="flex justify-end mt-3">
-            <Button size="sm">Отправить</Button>
-          </div>
-        </>
-      ),
+      content: <ChatWidget />,
       span: "md:col-span-2",
     },
+
     {
       title: (
         <div className="flex items-center gap-3">
