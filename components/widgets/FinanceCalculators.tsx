@@ -16,7 +16,16 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
-// ✅ форматируем числа красиво: 1 234 567 ₸
+// ✅ форматируем суммы с разделением разрядов
+const formatNumberInput = (value: string) => {
+  const num = value.replace(/\D/g, ""); // убираем всё кроме цифр
+  if (!num) return "";
+  return new Intl.NumberFormat("ru-RU").format(parseInt(num, 10));
+};
+
+// ✅ убираем пробелы для вычислений
+const cleanNumber = (value: string) => value.replace(/\s/g, "");
+
 const formatCurrency = (num: number) =>
   new Intl.NumberFormat("ru-RU", {
     style: "currency",
@@ -46,7 +55,7 @@ export default function FinanceCalculators() {
 
   // 💵 Кредит
   const calcLoan = () => {
-    const P = parseFloat(loan.amount);
+    const P = parseFloat(cleanNumber(loan.amount));
     const n = parseFloat(loan.term);
     const r = parseFloat(loan.rate) / 100 / 12;
     if (!P || !n || !r) return;
@@ -76,7 +85,9 @@ export default function FinanceCalculators() {
 
   // 🏠 Ипотека
   const calcMortgage = () => {
-    const P = parseFloat(mortgage.amount) - parseFloat(mortgage.down || "0");
+    const P =
+      parseFloat(cleanNumber(mortgage.amount)) -
+      parseFloat(cleanNumber(mortgage.down || "0"));
     const n = parseFloat(mortgage.term);
     const r = parseFloat(mortgage.rate) / 100 / 12;
     if (!P || !n || !r) return;
@@ -106,7 +117,7 @@ export default function FinanceCalculators() {
 
   // 🪙 Депозит
   const calcDeposit = () => {
-    const P = parseFloat(deposit.amount);
+    const P = parseFloat(cleanNumber(deposit.amount));
     const n = parseFloat(deposit.term);
     const r = parseFloat(deposit.rate) / 100 / 12;
     if (!P || !n || !r) return;
@@ -127,7 +138,7 @@ export default function FinanceCalculators() {
     setActiveTab("deposit");
   };
 
-  // 🧮 Выбор активного графика
+  // 🧮 Активный график
   const getChartData = () => {
     if (activeTab === "loan") return loanChart;
     if (activeTab === "mortgage") return mortgageChart;
@@ -164,11 +175,14 @@ export default function FinanceCalculators() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <input
-                  type="number"
+                  type="text"
                   placeholder="Сумма кредита (₸)"
                   value={loan.amount}
-                  onChange={(e) => setLoan({ ...loan, amount: e.target.value })}
+                  onChange={(e) =>
+                    setLoan({ ...loan, amount: formatNumberInput(e.target.value) })
+                  }
                   className="p-2 border rounded-md bg-muted text-sm"
+                  inputMode="numeric"
                 />
                 <input
                   type="number"
@@ -194,9 +208,15 @@ export default function FinanceCalculators() {
                   animate={{ opacity: 1 }}
                   className="mt-3 text-sm space-y-1"
                 >
-                  <p>💵 Ежемесячный платёж: <b>{formatCurrency(loanResult.payment)}</b></p>
-                  <p>📅 Общая сумма выплат: <b>{formatCurrency(loanResult.total)}</b></p>
-                  <p>⚠️ Переплата: <b>{formatCurrency(loanResult.overpay)}</b></p>
+                  <p>
+                    💵 Ежемесячный платёж: <b>{formatCurrency(loanResult.payment)}</b>
+                  </p>
+                  <p>
+                    📅 Общая сумма выплат: <b>{formatCurrency(loanResult.total)}</b>
+                  </p>
+                  <p>
+                    ⚠️ Переплата: <b>{formatCurrency(loanResult.overpay)}</b>
+                  </p>
                 </motion.div>
               )}
             </motion.div>
@@ -207,18 +227,30 @@ export default function FinanceCalculators() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                 <input
-                  type="number"
+                  type="text"
                   placeholder="Стоимость жилья (₸)"
                   value={mortgage.amount}
-                  onChange={(e) => setMortgage({ ...mortgage, amount: e.target.value })}
+                  onChange={(e) =>
+                    setMortgage({
+                      ...mortgage,
+                      amount: formatNumberInput(e.target.value),
+                    })
+                  }
                   className="p-2 border rounded-md bg-muted text-sm"
+                  inputMode="numeric"
                 />
                 <input
-                  type="number"
+                  type="text"
                   placeholder="Первоначальный взнос (₸)"
                   value={mortgage.down}
-                  onChange={(e) => setMortgage({ ...mortgage, down: e.target.value })}
+                  onChange={(e) =>
+                    setMortgage({
+                      ...mortgage,
+                      down: formatNumberInput(e.target.value),
+                    })
+                  }
                   className="p-2 border rounded-md bg-muted text-sm"
+                  inputMode="numeric"
                 />
                 <input
                   type="number"
@@ -244,9 +276,15 @@ export default function FinanceCalculators() {
                   animate={{ opacity: 1 }}
                   className="mt-3 text-sm space-y-1"
                 >
-                  <p>💵 Ежемесячный платёж: <b>{formatCurrency(mortgageResult.payment)}</b></p>
-                  <p>📅 Общая сумма выплат: <b>{formatCurrency(mortgageResult.total)}</b></p>
-                  <p>⚠️ Переплата: <b>{formatCurrency(mortgageResult.overpay)}</b></p>
+                  <p>
+                    💵 Ежемесячный платёж: <b>{formatCurrency(mortgageResult.payment)}</b>
+                  </p>
+                  <p>
+                    📅 Общая сумма выплат: <b>{formatCurrency(mortgageResult.total)}</b>
+                  </p>
+                  <p>
+                    ⚠️ Переплата: <b>{formatCurrency(mortgageResult.overpay)}</b>
+                  </p>
                 </motion.div>
               )}
             </motion.div>
@@ -257,11 +295,14 @@ export default function FinanceCalculators() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <input
-                  type="number"
+                  type="text"
                   placeholder="Сумма вклада (₸)"
                   value={deposit.amount}
-                  onChange={(e) => setDeposit({ ...deposit, amount: e.target.value })}
+                  onChange={(e) =>
+                    setDeposit({ ...deposit, amount: formatNumberInput(e.target.value) })
+                  }
                   className="p-2 border rounded-md bg-muted text-sm"
+                  inputMode="numeric"
                 />
                 <input
                   type="number"
@@ -287,8 +328,12 @@ export default function FinanceCalculators() {
                   animate={{ opacity: 1 }}
                   className="mt-3 text-sm space-y-1"
                 >
-                  <p>💰 Итоговая сумма: <b>{formatCurrency(depositResult.total)}</b></p>
-                  <p>📈 Доход: <b>{formatCurrency(depositResult.profit)}</b></p>
+                  <p>
+                    💰 Итоговая сумма: <b>{formatCurrency(depositResult.total)}</b>
+                  </p>
+                  <p>
+                    📈 Доход: <b>{formatCurrency(depositResult.profit)}</b>
+                  </p>
                 </motion.div>
               )}
             </motion.div>
@@ -297,7 +342,11 @@ export default function FinanceCalculators() {
 
         {/* 📊 График */}
         {getChartData().length > 0 && (
-          <motion.div className="mt-6 h-64" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+          <motion.div
+            className="mt-6 h-64"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={getChartData()}>
                 <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
@@ -313,9 +362,7 @@ export default function FinanceCalculators() {
                 <Legend />
                 <Line
                   type="monotone"
-                  dataKey={
-                    activeTab === "deposit" ? "Накопления" : "Основной долг"
-                  }
+                  dataKey={activeTab === "deposit" ? "Накопления" : "Основной долг"}
                   stroke="#10B981"
                   strokeWidth={2}
                   dot={false}
